@@ -96,11 +96,10 @@ const adminRegister = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    req.body.role = "admin";
     const user = await User.create({ ...req.body, password: hashedPassword });
 
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: "admin" },
+      { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       {
         expiresIn: "1h",
@@ -115,4 +114,4 @@ const adminRegister = async (req, res) => {
   }
 };
 
-module.exports = { register, login, logout };
+module.exports = { register, login, logout, adminRegister };
