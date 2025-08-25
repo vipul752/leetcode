@@ -7,16 +7,7 @@ const {
 
 const createProblem = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      difficulty,
-      tags,
-      visibleTestcase,
-      hiddenTestcase,
-      startCode,
-      referenceSolution,
-    } = req.body;
+    const { visibleTestcase, referenceSolution } = req.body;
 
     for (const { language, completeCode } of referenceSolution) {
       const languageId = getLanguageId(language);
@@ -130,6 +121,7 @@ const updateProblem = async (req, res) => {
       referenceSolution,
     } = req.body;
 
+
     if (!id) {
       return res.status(400).json({
         success: false,
@@ -230,7 +222,7 @@ const updateProblem = async (req, res) => {
       }
     }
 
-    const newProblem = await Problem.findByIdAndDelete(
+    const newProblem = await Problem.findByIdAndUpdate(
       id,
       { ...req.body },
       { runValidators: true, new: true }
@@ -278,7 +270,9 @@ const getProblemById = async (req, res) => {
       });
     }
 
-    const foundProblem = await Problem.findById(id);
+    const foundProblem = await Problem.findById(id).select(
+      "_id title description difficulty visibleTestcase startCode "
+    );
     if (!foundProblem) {
       return res.status(404).json({
         success: false,
@@ -294,7 +288,9 @@ const getProblemById = async (req, res) => {
 
 const getAllProblem = async (req, res) => {
   try {
-    const allProblem = await Problem.find({});
+    const allProblem = await Problem.find({}).select(
+      "_id title difficulty tags"
+    );
     if (allProblem.length == 0) {
       return res.status(404).json({
         success: false,
