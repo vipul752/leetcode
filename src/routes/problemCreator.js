@@ -9,6 +9,7 @@ const {
   getProblemById,
   getAllProblem,
   solvedProblemByUser,
+  submittedProblem
 } = require("../controller/problem.controller");
 
 problemRouter.post("/create", adminMiddleware, createProblem);
@@ -18,5 +19,6 @@ problemRouter.delete("/delete/:id", adminMiddleware, deleteProblem);
 problemRouter.get("/getProblem/:id", userMiddleware, getProblemById);
 problemRouter.get("/getAllProblem", userMiddleware, getAllProblem);
 problemRouter.get("/userProblem", userMiddleware, solvedProblemByUser);
+problemRouter.get('/submittedProblem/pid',userMiddleware,submittedProblem);
 
 module.exports = problemRouter;

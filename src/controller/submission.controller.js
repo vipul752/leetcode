@@ -5,10 +5,12 @@ const {
   submitBatch,
   submitToken,
 } = require("../utils/problemUtility");
+const submitRateLimiter = require("../middleware/redisRateLimiter");
 
 const submitCode = async (req, res) => {
   try {
     const user_id = req.result._id;
+
     const problem_id = req.params.id;
 
     console.log(user_id, problem_id);

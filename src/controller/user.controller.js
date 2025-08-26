@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const redisClient = require("../config/redis");
+const Submission = require("../model/submission");
 
 const generateToken = (user) =>
   jwt.sign(
@@ -114,4 +115,19 @@ const adminRegister = async (req, res) => {
   }
 };
 
-module.exports = { register, login, logout, adminRegister };
+const deleteProfile = async (req, res) => {
+  try {
+    const user = req.result._id;
+
+    await User.findByIdAndDelete(user);
+
+    await Submission.deleteMany({ userId: user });
+
+    res.status(200).json({ message: "Profile Deleted Successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to delete profile" });
+  }
+};
+
+module.exports = { register, login, logout, adminRegister, deleteProfile };

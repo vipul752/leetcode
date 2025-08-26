@@ -319,6 +319,27 @@ const solvedProblemByUser = async (req, res) => {
   }
 };
 
+const submittedProblem = async (req, res) => {
+  try {
+    const user_id = req.result._id;
+    const problem_id = req.params.pid;
+
+    const submissionCount = await Submission.find({ user_id, problem_id });
+    if (submissionCount.length == 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No submission found for this problem by the user",
+      });
+    }
+    res.status(200).json({ submissionCount });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "failed to get submissions count" });
+  }
+};
+
+
+
 module.exports = {
   createProblem,
   updateProblem,
@@ -326,4 +347,5 @@ module.exports = {
   getProblemById,
   getAllProblem,
   solvedProblemByUser,
+  submittedProblem,
 };
