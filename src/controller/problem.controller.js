@@ -1,4 +1,5 @@
 const Problem = require("../model/problem");
+const User = require("../model/user");
 const {
   getLanguageId,
   submitBatch,
@@ -120,7 +121,6 @@ const updateProblem = async (req, res) => {
       startCode,
       referenceSolution,
     } = req.body;
-
 
     if (!id) {
       return res.status(400).json({
@@ -304,10 +304,26 @@ const getAllProblem = async (req, res) => {
   }
 };
 
+const solvedProblemByUser = async (req, res) => {
+  try {
+    const user = req.result;
+    await user.populate({
+      path: "problemSolved",
+      select: "_id title difficulty tags",
+    });
+
+    res.status(200).json(user.problemSolved);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "failed to get solved problem count" });
+  }
+};
+
 module.exports = {
   createProblem,
   updateProblem,
   deleteProblem,
   getProblemById,
   getAllProblem,
+  solvedProblemByUser,
 };

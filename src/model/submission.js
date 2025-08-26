@@ -4,12 +4,12 @@ const submissionSchema = new mongoose.Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: true,
     },
     problem_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Problem",
+      ref: "problem",
       required: true,
     },
     code: {
@@ -46,6 +46,6 @@ const submissionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Submission = mongoose.model("Submission", submissionSchema);
+const Submission = mongoose.model("submission", submissionSchema);
 
 module.exports = Submission;

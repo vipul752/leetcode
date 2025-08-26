@@ -32,7 +32,13 @@ const userSchema = new mongoose.Schema(
       max: 80,
     },
     problemSolved: {
-      type: [String],
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "problem",
+        },
+      ],
+      unique: true,
     },
     password: {
       type: String,
