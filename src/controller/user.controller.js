@@ -32,9 +32,17 @@ const register = async (req, res) => {
         expiresIn: "1h",
       }
     );
+
+    const reply = {
+      firstName: user.firstName,
+      email: user.email,
+      _id: user._id,
+    };
     res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
 
-    res.status(201).json({ message: "User registered successfully", token });
+    res.status(201).json({
+      user: reply,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to register user" });
@@ -64,7 +72,15 @@ const login = async (req, res) => {
       maxAge: 3600000,
     });
 
-    res.status(200).json({ message: "User logged in successfully", token });
+    const reply = {
+      firstName: user.firstName,
+      email: user.email,
+      _id: user._id,
+    };
+
+    res.status(200).json({
+      user: reply,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to log in user" });
@@ -82,8 +98,8 @@ const logout = async (req, res) => {
     await redisClient.set(`token:${token}`, "Blocked");
     await redisClient.expireAt(`token:${token}`, payload.exp);
 
-    res.clearCookie("token");
-    res.status(200).json({ message: "User logged out successfully" });
+    res.cookie("token", null, { expires: new Date(Date.now()) });
+    res.send("Logged out successfully");
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to log out user" });
