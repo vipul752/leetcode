@@ -16,7 +16,10 @@ const submitCode = async (req, res) => {
     console.log(user_id, problem_id);
     const { code, language } = req.body;
 
-    if (!code || !language) {
+    let processedLanguage = language;
+    if (processedLanguage === "cpp") processedLanguage = "c++";
+
+    if (!code || !processedLanguage) {
       return res
         .status(400)
         .json({ message: "Code and language are required" });
@@ -31,7 +34,8 @@ const submitCode = async (req, res) => {
       code,
       language,
       status: "Pending",
-      testCasesPassed: problem.hiddenTestcase.length,
+      testCasesTotal:
+        (problem.hiddenTestcase && problem.hiddenTestcase.length) || 0,
     });
 
     //submit to judge0 api
@@ -56,18 +60,14 @@ const submitCode = async (req, res) => {
     let errorMessage = "";
 
     for (const test of testResult) {
-      if (test.status_id == 3) {
+      if (test.status && test.status.id === 3) {
         testCasesPassed++;
-        runTime += parseFloat(test.time);
-        memory = Math.max(memory, test.memory);
+        runTime += parseFloat(test.time || 0);
+        memory = Math.max(memory, test.memory || 0);
       } else {
-        if (test.status_id == 4) {
-          status = "Wrong";
-          errorMessage = test.stderr;
-        } else {
-          status = "Error";
-          errorMessage = test.stderr;
-        }
+        status = test.status && test.status.id === 4 ? "Wrong Answer" : "Error";
+        errorMessage = test.stderr || test.compile_output || "Unknown error";
+        break;
       }
     }
 
@@ -87,9 +87,13 @@ const submitCode = async (req, res) => {
       await user.save();
     }
 
+    const accepted = status === "Accepted";
     res.status(200).json({
-      message: "Code submitted successfully",
-      result: submittedResult,
+      accepted,
+      totalTestCases: submittedResult.testCasesTotal,
+      passedTestCases: testCasesPassed,
+      runTime,
+      memory,
     });
   } catch (error) {
     console.error("Error submitting code:", error);
@@ -102,7 +106,6 @@ const runCode = async (req, res) => {
     const user_id = req.result._id;
     const problem_id = req.params.id;
 
-    console.log(user_id, problem_id);
     const { code, language } = req.body;
 
     if (!code || !language) {
@@ -112,9 +115,11 @@ const runCode = async (req, res) => {
     }
 
     const problem = await Problem.findById(problem_id);
+    let processedLanguage = language;
+    if (processedLanguage === "cpp") processedLanguage = "c++";
 
     //submit to judge0 api
-    const languageId = getLanguageId(language);
+    const languageId = getLanguageId(processedLanguage);
 
     const submissions = problem.visibleTestcase.map((testcase) => ({
       source_code: code,
@@ -122,15 +127,44 @@ const runCode = async (req, res) => {
       stdin: testcase.input,
       expected_output: testcase.output,
     }));
-    console.log(submissions);
 
     const submitResult = await submitBatch(submissions);
     const resultToken = submitResult.map((value) => value.token);
     const testResult = await submitToken(resultToken);
 
-    const statuses = testResult.map((t) => t.status.description);
+    let testCasesPassed = 0;
+    let runTime = 0;
+    let memory = 0;
+    let status = true;
+    let testResults = [];
 
-    res.status(200).json({ statuses });
+    for (const test of testResult) {
+      const passed = test.status && test.status.id === 3;
+      if (passed) {
+        testCasesPassed++;
+        runTime += parseFloat(test.time || 0);
+        memory = Math.max(memory, test.memory || 0);
+      } else {
+        status = false;
+      }
+      testResults.push({
+        passed,
+        input: test.stdin || "",
+        expectedOutput: test.expected_output || "",
+        output: test.stdout || "",
+        error: test.stderr || test.compile_output || "",
+        time: test.time || 0,
+        memory: test.memory || 0,
+      });
+    }
+    res.status(200).json({
+      success: status,
+      testCases: testResults,
+      runTime,
+      memory,
+      totalTestCases: testResults.length,
+      passedTestCases: testCasesPassed,
+    });
   } catch (error) {
     console.error("Error submitting code:", error);
     res.status(500).json({ message: "Internal server error" } + error);

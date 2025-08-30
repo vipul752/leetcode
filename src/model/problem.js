@@ -11,7 +11,7 @@ const problemSchema = new mongoose.Schema({
   },
   difficulty: {
     type: String,
-    enum: ["easy", "medium", "hard"],
+    enum: ["Easy", "Medium", "Hard"],
     required: true,
   },
   tags: {
@@ -26,6 +26,7 @@ const problemSchema = new mongoose.Schema({
       "Queue",
       "Heap",
     ],
+    default: [],
     required: true,
   },
   visibleTestcase: [

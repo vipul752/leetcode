@@ -1,5 +1,6 @@
 const Problem = require("../model/problem");
 const User = require("../model/user");
+const Submission = require("../model/submission");
 const {
   getLanguageId,
   submitBatch,
@@ -271,7 +272,7 @@ const getProblemById = async (req, res) => {
     }
 
     const foundProblem = await Problem.findById(id).select(
-      "_id title description difficulty visibleTestcase startCode "
+      "_id title description difficulty visibleTestcase startCode referenceSolution"
     );
     if (!foundProblem) {
       return res.status(404).json({
@@ -318,27 +319,32 @@ const solvedProblemByUser = async (req, res) => {
     res.status(500).json({ message: "failed to get solved problem count" });
   }
 };
-
 const submittedProblem = async (req, res) => {
   try {
-    const user_id = req.result._id;
+    const user_id = req.result._id; // from middleware auth
     const problem_id = req.params.pid;
 
-    const submissionCount = await Submission.find({ user_id, problem_id });
-    if (submissionCount.length == 0) {
+    // Find all submissions by this user for this problem
+    const submissions = await Submission.find({ user_id, problem_id }).sort({
+      createdAt: -1,
+    });
+
+    if (!submissions || submissions.length === 0) {
       return res.status(404).json({
         success: false,
         message: "No submission found for this problem by the user",
       });
     }
-    res.status(200).json({ submissionCount });
+
+    res.status(200).json({
+      success: true,
+      submissions,
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "failed to get submissions count" });
+    console.error(error);
+    res.status(500).json({ message: "Failed to get submissions" });
   }
 };
-
-
 
 module.exports = {
   createProblem,
