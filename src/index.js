@@ -11,6 +11,7 @@ const aiRouter = require("./routes/ai");
 const session = require("express-session");
 const cors = require("cors");
 
+app.set("trust proxy", 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
