@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://leetcode-frontend-cpss.vercel.app",
+    origin: "https://68b436872fd3df4fafd146d2--leetcode12.netlify.app",
     credentials: true,
   })
 );
