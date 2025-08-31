@@ -20,10 +20,27 @@ app.use(
   })
 );
 
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true, // true because Render uses HTTPS
+      sameSite: "none", // needed for cross-site requests
+      httpOnly: true,
+    },
+  })
+);
+
 app.use("/user", authRouter);
 app.use("/problem", problemRouter);
 app.use("/submission", submitRouter);
 app.use("/ai", aiRouter);
+
+app.get("/test", (req, res) => {
+  res.json({ message: "Backend connected!" });
+});
 
 const initialseDB = async () => {
   try {
