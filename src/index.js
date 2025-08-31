@@ -7,6 +7,7 @@ const authRouter = require("./routes/userAuth");
 const redisClient = require("./config/redis");
 const problemRouter = require("./routes/problemCreator");
 const submitRouter = require("./routes/submission");
+const aiRouter = require("./routes/ai");
 const cors = require("cors");
 
 app.use(express.json());
@@ -22,6 +23,7 @@ app.use(
 app.use("/user", authRouter);
 app.use("/problem", problemRouter);
 app.use("/submission", submitRouter);
+app.use("/ai", aiRouter);
 
 const initialseDB = async () => {
   try {
