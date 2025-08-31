@@ -8,6 +8,7 @@ const redisClient = require("./config/redis");
 const problemRouter = require("./routes/problemCreator");
 const submitRouter = require("./routes/submission");
 const aiRouter = require("./routes/ai");
+const session = require("express-session");
 const cors = require("cors");
 
 app.use(express.json());
