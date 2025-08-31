@@ -25,6 +25,7 @@ const problemSchema = new mongoose.Schema({
       "Stack",
       "Queue",
       "Heap",
+      "Tree",
     ],
     default: [],
     required: true,
@@ -63,11 +64,9 @@ const problemSchema = new mongoose.Schema({
     {
       language: {
         type: String,
-        required: true,
       },
       initialCode: {
         type: String,
-        required: true,
       },
     },
   ],
@@ -75,11 +74,9 @@ const problemSchema = new mongoose.Schema({
     {
       language: {
         type: String,
-        required: true,
       },
       completeCode: {
         type: String,
-        required: true,
       },
     },
   ],
