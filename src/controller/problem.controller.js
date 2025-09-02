@@ -7,7 +7,6 @@ const {
   submitToken,
 } = require("../utils/problemUtility");
 const SolutionVideo = require("../model/solutionVideo");
-const { response } = require("express");
 
 const createProblem = async (req, res) => {
   try {
@@ -255,6 +254,7 @@ const deleteProblem = async (req, res) => {
       });
     }
 
+    // Delete the problem
     const deletedProblem = await Problem.findByIdAndDelete(id);
     if (!deletedProblem) {
       return res.status(404).json({
@@ -262,10 +262,29 @@ const deleteProblem = async (req, res) => {
         message: "Problem not found",
       });
     }
-    res.status(204).send("Problem Deleted Successfully");
+
+    // Remove this problem id from all users' problemSolved
+    await User.updateMany(
+      { problemSolved: id }, // only users who solved it
+      { $pull: { problemSolved: id } } // remove from array
+    );
+
+    // If you also want to remove from submissions or other arrays:
+    await User.updateMany(
+      { problemSubmitted: id },
+      { $pull: { problemSubmitted: id } }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Problem deleted successfully and removed from users",
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "failed to delete problem" });
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete problem",
+    });
   }
 };
 
@@ -343,6 +362,7 @@ const solvedProblemByUser = async (req, res) => {
     res.status(500).json({ message: "failed to get solved problem count" });
   }
 };
+
 const submittedProblem = async (req, res) => {
   try {
     const user_id = req.result._id; // from middleware auth
@@ -360,13 +380,80 @@ const submittedProblem = async (req, res) => {
       });
     }
 
+    // --- STREAK CALCULATION ---
+    // Get all submissions by this user (for streak, not just this problem)
+    const allUserSubmissions = await Submission.find({ user_id }).sort({
+      createdAt: -1,
+    });
+
+    // Extract unique days when user submitted something
+    const submissionDays = [
+      ...new Set(
+        allUserSubmissions.map(
+          (s) => new Date(s.createdAt).toISOString().split("T")[0]
+        )
+      ),
+    ].sort((a, b) => new Date(b) - new Date(a)); // Sort descending
+
+    let streak = 0;
+    let today = new Date().toISOString().split("T")[0];
+    let expectedDate = today;
+
+    for (let day of submissionDays) {
+      if (day === expectedDate) {
+        streak++;
+        // move expectedDate one day back
+        let d = new Date(expectedDate);
+        d.setDate(d.getDate() - 1);
+        expectedDate = d.toISOString().split("T")[0];
+      } else {
+        break; // streak breaks
+      }
+    }
+
     res.status(200).json({
       success: true,
       submissions,
+      streak, // added streak info
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to get submissions" });
+  }
+};
+
+const getUserStats = async (req, res) => {
+  try {
+    const userId = req.result._id;
+
+    const submissions = await Submission.find({ user_id: userId });
+
+    const solvedSet = new Set();
+    let totalSubmissions = submissions.length;
+    let accepted = 0;
+
+    submissions.forEach((s) => {
+      if (s.status === "Accepted") {
+        solvedSet.add(s.problem_id.toString());
+        accepted++;
+      }
+    });
+
+    const problems = await Problem.find({ _id: { $in: [...solvedSet] } });
+    const byDifficulty = { Easy: 0, Medium: 0, Hard: 0 };
+    problems.forEach((p) => byDifficulty[p.difficulty]++);
+
+    res.status(200).json({
+      totalSolved: solvedSet.size,
+      totalSubmissions,
+      acceptanceRate: totalSubmissions
+        ? (accepted / totalSubmissions) * 100
+        : 0,
+      byDifficulty,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to get user stats" });
   }
 };
 
@@ -378,4 +465,5 @@ module.exports = {
   getAllProblem,
   solvedProblemByUser,
   submittedProblem,
+  getUserStats,
 };

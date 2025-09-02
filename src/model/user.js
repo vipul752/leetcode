@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      require: true,
+      required: true,
       minLength: 3,
       maxLength: 20,
     },
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      require: true,
+      required: true,
       unique: true,
       trim: true,
       lowercase: true,
@@ -31,18 +31,48 @@ const userSchema = new mongoose.Schema(
       min: 6,
       max: 80,
     },
-    problemSolved: {
-      type: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "problem",
-          unique: true,
-        },
-      ],
-    },
     password: {
       type: String,
-      require: true,
+      required: true,
+    },
+
+    // ✅ Profile fields
+    avatar: {
+      type: String, // Cloudinary URL for profile pic
+      default: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+    },
+    bio: {
+      type: String,
+      maxLength: 200,
+    },
+    location: {
+      type: String,
+    },
+
+    // ✅ Problem tracking
+    problemSolved: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "problem",
+      },
+    ],
+    problemSubmitted: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "problem",
+      },
+    ],
+
+    totalSolved: {
+      type: Number,
+      default: 0,
+    },
+    streak: {
+      type: Number,
+      default: 0,
+    },
+    lastSolvedAt: {
+      type: Date,
     },
   },
   {

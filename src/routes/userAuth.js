@@ -6,6 +6,8 @@ const {
   logout,
   adminRegister,
   deleteProfile,
+  getProfile,
+  updateProfile,
 } = require("../controller/user.controller");
 const userMiddleware = require("../middleware/userMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
@@ -25,6 +27,7 @@ authRouter.get("/check", userMiddleware, (req, res) => {
 
   res.status(200).json({ user: reply });
 });
-// authRouter.get("/getProfile", getProfile);
+authRouter.get("/getProfile", userMiddleware, getProfile);
+authRouter.put("/updateProfile", userMiddleware, updateProfile);
 
 module.exports = authRouter;

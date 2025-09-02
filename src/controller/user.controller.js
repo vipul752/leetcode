@@ -147,4 +147,46 @@ const deleteProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, logout, adminRegister, deleteProfile };
+const getProfile = async (req, res) => {
+  try {
+    const userId = req.result._id;
+    const user = await User.findById(userId)
+      .select("-password")
+      .populate("problemSolved.problem"); 
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({ profile: user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch profile" });
+  }
+};
+
+const updateProfile = async (req, res) => {
+  try {
+    const userId = req.result._id;
+    const { firstName, lastName, bio, avatar, location, age } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { firstName, lastName, bio, avatar, location, age },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    res.status(200).json({ message: "Profile updated", profile: updatedUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to update profile" });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  adminRegister,
+  deleteProfile,
+  getProfile,
+  updateProfile,
+};
