@@ -8,6 +8,7 @@ const redisClient = require("./config/redis");
 const problemRouter = require("./routes/problemCreator");
 const submitRouter = require("./routes/submission");
 const aiRouter = require("./routes/ai");
+const videoRouter = require("./routes/videoCreator");
 const session = require("express-session");
 const cors = require("cors");
 
@@ -17,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://68b436872fd3df4fafd146d2--leetcode12.netlify.app",
+    origin: " http://localhost:5173",
     credentials: true,
   })
 );
@@ -39,6 +40,7 @@ app.use("/user", authRouter);
 app.use("/problem", problemRouter);
 app.use("/submission", submitRouter);
 app.use("/ai", aiRouter);
+app.use("/video", videoRouter);
 
 app.get("/test", (req, res) => {
   res.json({ message: "Backend connected!" });

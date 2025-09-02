@@ -6,6 +6,8 @@ const {
   submitBatch,
   submitToken,
 } = require("../utils/problemUtility");
+const SolutionVideo = require("../model/solutionVideo");
+const { response } = require("express");
 
 const createProblem = async (req, res) => {
   try {
@@ -138,100 +140,107 @@ const updateProblem = async (req, res) => {
       });
     }
 
-    for (const { language, completeCode } of referenceSolution) {
-      const languageId = getLanguageId(language);
+    if (referenceSolution && referenceSolution.length > 0) {
+      for (const { language, completeCode } of referenceSolution) {
+        const languageId = getLanguageId(language);
 
-      const submissions = visibleTestcase.map((testcase) => ({
-        source_code: completeCode,
-        language_id: languageId,
-        stdin: testcase.input,
-        expected_output: testcase.output,
-      }));
+        const submissions = visibleTestcase.map((testcase) => ({
+          source_code: completeCode,
+          language_id: languageId,
+          stdin: testcase.input,
+          expected_output: testcase.output,
+        }));
 
-      const submitResult = await submitBatch(submissions);
+        const submitResult = await submitBatch(submissions);
+        const resultToken = submitResult.map((value) => value.token);
+        const testResult = await submitToken(resultToken);
 
-      const resultToken = submitResult.map((value) => value.token);
+        for (const test of testResult) {
+          const { status, stdout, stderr, compile_output } = test;
 
-      const testResult = await submitToken(resultToken);
+          switch (status.id) {
+            case 1:
+            case 2:
+              return res.status(202).json({
+                success: false,
+                message: "Testcase still running",
+                status: status.description,
+              });
 
-      for (const test of testResult) {
-        const { status, stdout, stderr, compile_output } = test;
+            case 3:
+              break;
 
-        switch (status.id) {
-          case 1:
-          case 2:
-            return res.status(202).json({
-              success: false,
-              message: "Testcase still running",
-              status: status.description,
-            });
+            case 4:
+              return res.status(400).json({
+                success: false,
+                message: "Wrong Answer",
+                expected: test.expected_output?.trim(),
+                got: stdout?.trim(),
+              });
 
-          case 3:
-            break;
+            case 5:
+              return res.status(408).json({
+                success: false,
+                message: "Time Limit Exceeded",
+              });
 
-          case 4:
-            return res.status(400).json({
-              success: false,
-              message: "Wrong Answer",
-              expected: test.expected_output?.trim(),
-              got: stdout?.trim(),
-            });
+            case 6:
+              return res.status(400).json({
+                success: false,
+                message: "Compilation Error",
+                compilerOutput: compile_output,
+              });
 
-          case 5:
-            return res.status(408).json({
-              success: false,
-              message: "Time Limit Exceeded",
-            });
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+              return res.status(400).json({
+                success: false,
+                message: `Runtime Error: ${status.description}`,
+                stderr,
+              });
 
-          case 6:
-            return res.status(400).json({
-              success: false,
-              message: "Compilation Error",
-              compilerOutput: compile_output,
-            });
+            case 13:
+              return res.status(500).json({
+                success: false,
+                message: "Internal Error on Judge",
+              });
 
-          case 7:
-          case 8:
-          case 9:
-          case 10:
-          case 11:
-          case 12:
-            return res.status(400).json({
-              success: false,
-              message: `Runtime Error: ${status.description}`,
-              stderr,
-            });
+            case 14:
+              return res.status(400).json({
+                success: false,
+                message: "Exec Format Error",
+              });
 
-          case 13:
-            return res.status(500).json({
-              success: false,
-              message: "Internal Error on Judge",
-            });
-
-          case 14:
-            return res.status(400).json({
-              success: false,
-              message: "Exec Format Error",
-            });
-
-          default:
-            return res.status(400).json({
-              success: false,
-              message: `Unknown status: ${status.description}`,
-            });
+            default:
+              return res.status(400).json({
+                success: false,
+                message: `Unknown status: ${status.description}`,
+              });
+          }
         }
       }
     }
 
     const newProblem = await Problem.findByIdAndUpdate(
       id,
-      { ...req.body },
-      { runValidators: true, new: true }
+      { $set: req.body },
+      { runValidators: false, new: true }
     );
-    res.status(201).send("Problem update successfully", newProblem);
+
+    res.status(200).json({
+      success: true,
+      message: "Problem updated successfully",
+      problem: newProblem,
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "failed to update problem" });
+    console.error("Update error:", error);
+    res
+      .status(500)
+      .json({ message: "failed to update problem", error: error.message });
   }
 };
 
@@ -279,6 +288,21 @@ const getProblemById = async (req, res) => {
         success: false,
         message: "Problem not found",
       });
+    }
+
+    const video = await SolutionVideo.findOne({ problemId: id });
+
+    if (video) {
+      const responseData = {
+        ...foundProblem.toObject(),
+
+        // cloudinaryPublicId: video.cloudinaryPublicId,
+        secureUrl: video.secureUrl,
+        duration: video.duration,
+        thumbnailUrl: video.thumbnailUrl,
+      };
+      console.log(responseData);
+      return res.status(200).send(responseData);
     }
     res.status(200).send(foundProblem);
   } catch (error) {

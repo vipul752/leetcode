@@ -13,7 +13,7 @@ const submitCode = async (req, res) => {
 
     const problem_id = req.params.id;
 
-    console.log(user_id, problem_id);
+
     const { code, language } = req.body;
 
     let processedLanguage = language;
@@ -27,7 +27,6 @@ const submitCode = async (req, res) => {
 
     const problem = await Problem.findById(problem_id);
 
-    //store submission in databse to avoid the loss data
     const submittedResult = await Submission.create({
       user_id,
       problem_id,
@@ -38,7 +37,6 @@ const submitCode = async (req, res) => {
         (problem.hiddenTestcase && problem.hiddenTestcase.length) || 0,
     });
 
-    //submit to judge0 api
     const languageId = getLanguageId(language);
 
     const submissions = (problem.hiddenTestcase || []).map((testcase) => ({
@@ -47,7 +45,7 @@ const submitCode = async (req, res) => {
       stdin: testcase.input,
       expected_output: testcase.output,
     }));
-    console.log(submissions);
+    
 
     const submitResult = await submitBatch(submissions);
     const resultToken = submitResult.map((value) => value.token);
@@ -71,7 +69,6 @@ const submitCode = async (req, res) => {
       }
     }
 
-    //save submission result in DB
     submittedResult.status = status;
     submittedResult.testCasesPassed = testCasesPassed;
     submittedResult.runtime = runTime;
@@ -80,7 +77,6 @@ const submitCode = async (req, res) => {
 
     await submittedResult.save();
 
-    //check problemSolved in userSchema it is present or not
     if (!req.result.problemSolved.includes(problem_id)) {
       const user = req.result;
       user.problemSolved.push(problem_id);
@@ -118,7 +114,6 @@ const runCode = async (req, res) => {
     let processedLanguage = language;
     if (processedLanguage === "cpp") processedLanguage = "c++";
 
-    //submit to judge0 api
     const languageId = getLanguageId(processedLanguage);
 
     const submissions = problem.visibleTestcase.map((testcase) => ({
