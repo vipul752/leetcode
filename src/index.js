@@ -11,6 +11,7 @@ const aiRouter = require("./routes/ai");
 const videoRouter = require("./routes/videoCreator");
 const session = require("express-session");
 const cors = require("cors");
+const contestRouter = require("./routes/contest");
 
 app.set("trust proxy", 1);
 app.use(express.json());
@@ -41,6 +42,7 @@ app.use("/problem", problemRouter);
 app.use("/submission", submitRouter);
 app.use("/ai", aiRouter);
 app.use("/video", videoRouter);
+app.use("/contest", contestRouter);
 
 app.get("/test", (req, res) => {
   res.json({ message: "Backend connected!" });

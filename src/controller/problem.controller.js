@@ -12,6 +12,19 @@ const createProblem = async (req, res) => {
   try {
     const { visibleTestcase, referenceSolution } = req.body;
 
+    if (!Array.isArray(referenceSolution) || referenceSolution.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "referenceSolution must be a non-empty array",
+      });
+    }
+    if (!Array.isArray(visibleTestcase) || visibleTestcase.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "visibleTestcase must be a non-empty array",
+      });
+    }
+
     for (const { language, completeCode } of referenceSolution) {
       const languageId = getLanguageId(language);
 
@@ -380,8 +393,7 @@ const submittedProblem = async (req, res) => {
       });
     }
 
-    // --- STREAK CALCULATION ---
-    // Get all submissions by this user (for streak, not just this problem)
+  
     const allUserSubmissions = await Submission.find({ user_id }).sort({
       createdAt: -1,
     });

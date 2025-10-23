@@ -81,6 +81,13 @@ const problemSchema = new mongoose.Schema({
     },
   ],
 
+  contests: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "contest",
+    },
+  ],
+
   problemCreator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",

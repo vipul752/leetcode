@@ -42,6 +42,11 @@ const submissionSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    contest_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "contest",
+      default: null,
+    }, // 👈 new
   },
   { timestamps: true }
 );

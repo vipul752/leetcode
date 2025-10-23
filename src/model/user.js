@@ -62,7 +62,7 @@ const userSchema = new mongoose.Schema(
         ref: "problem",
       },
     ],
-
+    contests: [{ type: mongoose.Schema.Types.ObjectId, ref: "contest" }],
     totalSolved: {
       type: Number,
       default: 0,
