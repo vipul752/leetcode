@@ -13,9 +13,11 @@ const session = require("express-session");
 const cors = require("cors");
 const contestRouter = require("./routes/contest");
 const challengeRouter = require("./routes/challenge");
+const aiInterviewRouter = require("./routes/aiInterview");
 const initSocket = require("./config/socket");
 const { Server } = require("socket.io");
 const http = require("http");
+const aiVideoRouter = require("./routes/videoInterviewRouter");
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -59,6 +61,8 @@ app.use("/ai", aiRouter);
 app.use("/video", videoRouter);
 app.use("/contest", contestRouter);
 app.use("/challenge", challengeRouter);
+app.use("/ai-interview", aiInterviewRouter);
+app.use("/api/video-interview", aiVideoRouter);
 
 app.get("/test", (req, res) => {
   res.json({ message: "Backend connected!" });
