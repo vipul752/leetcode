@@ -3,7 +3,6 @@ const validate = require("../utils/validator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const redisClient = require("../config/redis");
 const Submission = require("../model/submission");
 
 const generateToken = (user) =>
@@ -95,16 +94,12 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    const { token } = req.cookies;
-    if (!token) return res.status(400).json({ message: "No token provided" });
-
-    const payload = jwt.decode(token);
-    if (!payload) return res.status(400).json({ message: "Invalid token" });
-
-    await redisClient.set(`token:${token}`, "Blocked");
-    await redisClient.expireAt(`token:${token}`, payload.exp);
-
-    res.cookie("token", null, { expires: new Date(Date.now()) });
+    res.cookie("token", null, {
+      expires: new Date(Date.now()),
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    });
     res.send("Logged out successfully");
   } catch (error) {
     console.error(error);

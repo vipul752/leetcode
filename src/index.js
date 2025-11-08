@@ -37,6 +37,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: "https://leetcode-frontend-75.vercel.app",
+    // origin: "http://localhost:5173",
     credentials: true,
   })
 );
@@ -48,7 +49,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       secure: true, // true because Render uses HTTPS
-      sameSite: "none", // needed for cross-site requests
+      sameSite: "none", // needed for cross-site requestsr
       httpOnly: true,
     },
   })

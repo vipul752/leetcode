@@ -14,7 +14,7 @@ const adminMiddleware = require("../middleware/adminMiddleware");
 
 authRouter.post("/register", register);
 authRouter.post("/login", login);
-authRouter.post("/logout", userMiddleware, logout);
+authRouter.post("/logout", logout);
 authRouter.post("/admin/register", adminMiddleware, adminRegister);
 authRouter.delete("/deleteProfile", userMiddleware, deleteProfile);
 authRouter.get("/check", userMiddleware, (req, res) => {
