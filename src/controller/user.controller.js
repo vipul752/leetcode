@@ -38,7 +38,12 @@ const register = async (req, res) => {
       email: user.email,
       _id: user._id,
     };
-    res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+      maxAge: 3600000,
+    });
 
     res.status(201).json({
       user: reply,
@@ -152,7 +157,7 @@ const getProfile = async (req, res) => {
     const userId = req.result._id;
     const user = await User.findById(userId)
       .select("-password")
-      .populate("problemSolved.problem"); 
+      .populate("problemSolved.problem");
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
