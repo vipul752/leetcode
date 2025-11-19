@@ -17,6 +17,7 @@ const aiInterviewRouter = require("./routes/aiInterview");
 const initSocket = require("./config/socket");
 const { Server } = require("socket.io");
 const http = require("http");
+const resumeRouter = require("./routes/resumeRoutes");
 const aiVideoRouter = require("./routes/videoInterviewRouter");
 
 const server = http.createServer(app);
@@ -70,6 +71,7 @@ app.use("/contest", contestRouter);
 app.use("/challenge", challengeRouter);
 app.use("/ai-interview", aiInterviewRouter);
 app.use("/api/video-interview", aiVideoRouter);
+app.use("/resume", resumeRouter);
 
 app.get("/test", (req, res) => {
   res.json({ message: "Backend connected!" });
