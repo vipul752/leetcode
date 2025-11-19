@@ -333,7 +333,6 @@ const getProblemById = async (req, res) => {
         duration: video.duration,
         thumbnailUrl: video.thumbnailUrl,
       };
-      console.log(responseData);
       return res.status(200).send(responseData);
     }
     res.status(200).send(foundProblem);

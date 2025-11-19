@@ -9,12 +9,9 @@ function initSocket(io) {
   const challengeNamespace = io.of("/challenge");
 
   challengeNamespace.on("connection", (socket) => {
-    console.log("✅ New socket connected:", socket.id);
-
-    console.log("⚡ New socket connected:", socket.id);
+  
 
     socket.on("joinAsCreator", async ({ roomId, userId }) => {
-      console.log(`🟢 Creator ${userId} attempting to join ${roomId}`);
 
       // Find room with case-insensitive search
       const room = await ChallengeRoom.findOne({
@@ -22,17 +19,15 @@ function initSocket(io) {
       }).populate("problem");
 
       if (!room) {
-        console.log(`❌ Room not found: ${roomId}`);
+      
         return socket.emit("error", { message: "Room not found" });
       }
 
       // Use exact roomId from database
       socket.join(room.roomId);
-      console.log(`✅ Creator socket ${socket.id} joined room ${room.roomId}`);
-      console.log(`📦 Room state: ${room.state}, Opponent: ${room.opponent}`);
+
 
       if (room.state === "running" && room.opponent) {
-        console.log(`⚡ Sending challengeStarted to creator (already running)`);
         socket.emit("challengeStarted", {
           problem: room.problem,
           startAt: room.startAt,
@@ -41,10 +36,8 @@ function initSocket(io) {
           message: "⚡ Challenge already started!",
         });
       } else if (room.state === "finished") {
-        console.log(`✅ Challenge finished, sending winner info`);
         socket.emit("winner", { winner: room.winner });
       } else {
-        console.log(`⏳ Sending waiting state to creator`);
         socket.emit("waiting", {
           message: "Waiting for opponent to join...",
           problem: room.problem,
@@ -55,7 +48,6 @@ function initSocket(io) {
     });
 
     socket.on("joinRoom", async ({ roomId, userId }) => {
-      console.log(`👥 Opponent ${userId} attempting to join ${roomId}`);
 
       // Find room with case-insensitive search
       const room = await ChallengeRoom.findOne({
@@ -63,13 +55,11 @@ function initSocket(io) {
       }).populate("problem");
 
       if (!room) {
-        console.log(`❌ Room not found: ${roomId}`);
         return socket.emit("error", { message: "Room not found" });
       }
 
       // Use exact roomId from database
       socket.join(room.roomId);
-      console.log(`✅ Opponent socket ${socket.id} joined room ${room.roomId}`);
 
       if (!room.creator) {
         room.creator = userId;
@@ -81,9 +71,6 @@ function initSocket(io) {
         room.startAt = Date.now();
         await room.save();
 
-        console.log(
-          `📢 SOCKET: Broadcasting challengeStarted to room ${room.roomId}`
-        );
 
         // First notify about opponent joining
         challengeNamespace.to(room.roomId).emit("opponentJoined", {
@@ -100,7 +87,6 @@ function initSocket(io) {
           message: "⚡ Challenge started!",
         });
       } else {
-        console.log(`♻️ Opponent rejoined, resending challengeStarted`);
         socket.emit("challengeStarted", {
           problem: room.problem,
           startAt: room.startAt,
