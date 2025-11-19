@@ -13,7 +13,6 @@ const submitCode = async (req, res) => {
 
     const problem_id = req.params.id;
 
-
     const { code, language } = req.body;
 
     let processedLanguage = language;
@@ -31,13 +30,13 @@ const submitCode = async (req, res) => {
       user_id,
       problem_id,
       code,
-      language,
+      language: processedLanguage,
       status: "Pending",
       testCasesTotal:
         (problem.hiddenTestcase && problem.hiddenTestcase.length) || 0,
     });
 
-    const languageId = getLanguageId(language);
+    const languageId = getLanguageId(processedLanguage);
 
     const submissions = (problem.hiddenTestcase || []).map((testcase) => ({
       source_code: code,
@@ -45,7 +44,6 @@ const submitCode = async (req, res) => {
       stdin: testcase.input,
       expected_output: testcase.output,
     }));
-    
 
     const submitResult = await submitBatch(submissions);
     const resultToken = submitResult.map((value) => value.token);

@@ -37,12 +37,13 @@ app.use(cookieParser());
 app.use(
   cors({
     // origin: "https://leetcode-frontend-75.vercel.app",
-    origin:[
-    "https://codearena.digital",
-    "https://www.codearena.digital",
-    "https://codearena1-r7ab8a9ah-vipuls-projects-75a276d5.vercel.app",   // add this
-    "https://codearena1-ezm7gs1p9-vipuls-projects-75a276d5.vercel.app"    // and this (latest)
-  ],
+    origin: [
+      "https://codearena.digital",
+      "https://www.codearena.digital",
+      "https://codearena1-r7ab8a9ah-vipuls-projects-75a276d5.vercel.app", // add this
+      "https://codearena1-ezm7gs1p9-vipuls-projects-75a276d5.vercel.app", // and this (latest)
+      "http://localhost:5173",
+    ],
     credentials: true,
   })
 );

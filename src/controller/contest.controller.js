@@ -240,6 +240,9 @@ const submitContestCode = async (req, res) => {
         .status(400)
         .json({ message: "Code and language are required" });
 
+    let processedLanguage = language;
+    if (processedLanguage === "cpp") processedLanguage = "c++";
+
     const contest = await Contest.findById(contestId);
     if (!contest) return res.status(404).json({ message: "Contest not found" });
 
@@ -252,7 +255,7 @@ const submitContestCode = async (req, res) => {
     const problem = await Problem.findById(problemId);
     if (!problem) return res.status(404).json({ message: "Problem not found" });
 
-    const languageId = getLanguageId(language);
+    const languageId = getLanguageId(processedLanguage);
     const submissions = (problem.hiddenTestcase || []).map((testcase) => ({
       source_code: code,
       language_id: languageId,
@@ -288,10 +291,11 @@ const submitContestCode = async (req, res) => {
       contestId,
       problemId,
       code,
-      language,
+      language: processedLanguage,
       status,
       testCasesPassed,
-      testCasesTotal: (problem.hiddenTestcase && problem.hiddenTestcase.length) || 0,
+      testCasesTotal:
+        (problem.hiddenTestcase && problem.hiddenTestcase.length) || 0,
       runtime: runTime,
       memory,
       errorMessage,
@@ -299,7 +303,8 @@ const submitContestCode = async (req, res) => {
 
     res.status(200).json({
       accepted: status === "Accepted",
-      totalTestCases: (problem.hiddenTestcase && problem.hiddenTestcase.length) || 0,
+      totalTestCases:
+        (problem.hiddenTestcase && problem.hiddenTestcase.length) || 0,
       passedTestCases: testCasesPassed,
       runTime,
       memory,
@@ -439,5 +444,5 @@ module.exports = {
   getSingleContests,
   getContestProblems,
   userContest,
-  getUserSubmissions
+  getUserSubmissions,
 };
