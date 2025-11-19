@@ -37,7 +37,7 @@ app.use(cookieParser());
 app.use(
   cors({
     // origin: "https://leetcode-frontend-75.vercel.app",
-    [
+    origin:[
     "https://codearena.digital",
     "https://www.codearena.digital",
     "https://codearena1-r7ab8a9ah-vipuls-projects-75a276d5.vercel.app",   // add this
