@@ -10,12 +10,10 @@ const startAIInterview = async (req, res) => {
   try {
     const userId = req.result._id;
 
-    // 1️⃣ Create AI Interview session
     const sessionId = await startInterview(userId);
     const session = getSession(sessionId);
     const first = await generateNextQuestion(session);
 
-    // 2️⃣ Create Daily.co video room
     const videoRoom = await axios.post(
       "https://api.daily.co/v1/rooms",
       {

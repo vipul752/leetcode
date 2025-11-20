@@ -16,9 +16,12 @@ const {
   getContestProblems,
   userContest,
   getUserSubmissions,
+  getNoOfContest,
 } = require("../controller/contest.controller");
 
+contestRouter.get("/getNoOfContest", getNoOfContest);
 contestRouter.post("/create", adminMiddleware, createContest);
+
 contestRouter.get("/getAllContests", getAllContests);
 contestRouter.post(
   "/register/:contestId",

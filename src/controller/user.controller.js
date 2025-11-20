@@ -181,6 +181,16 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const getNoOfUsers = async (req,res) => {
+  try {
+    const count = await User.countDocuments();
+    res.status(200).json({ userCount: count });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to fetch users count" });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -189,4 +199,5 @@ module.exports = {
   deleteProfile,
   getProfile,
   updateProfile,
+  getNoOfUsers,
 };

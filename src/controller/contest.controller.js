@@ -432,6 +432,16 @@ const getUserSubmissions = async (req, res) => {
   }
 };
 
+const getNoOfContest = async (req, res) => {
+  try {
+    const count = await Contest.countDocuments();
+    res.status(200).json({ contestCount: count });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Failed to fetch contests count" });
+  }
+};
+
 module.exports = {
   createContest,
   getAllContests,
@@ -445,4 +455,5 @@ module.exports = {
   getContestProblems,
   userContest,
   getUserSubmissions,
+  getNoOfContest,
 };

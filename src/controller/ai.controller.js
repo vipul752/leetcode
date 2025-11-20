@@ -19,7 +19,6 @@ CURRENT PROBLEM CONTEXT:
       `,
     });
 
-    // Ensure proper format for Gemini API
     const formattedMessages = (messages || []).map((msg) => ({
       role: msg.role || "user",
       parts: msg.parts?.map((p) => ({ text: p.text })) || [],
