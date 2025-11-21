@@ -74,6 +74,9 @@ const userSchema = new mongoose.Schema(
     lastSolvedAt: {
       type: Date,
     },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
   },
   {
     timestamps: true,
@@ -81,8 +84,6 @@ const userSchema = new mongoose.Schema(
 );
 
 //pre save mongoose
-
-
 
 const User = mongoose.model("user", userSchema);
 module.exports = User;

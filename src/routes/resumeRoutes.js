@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const { analyzeResume } = require("../controller/resumeController");
+const { analyzeResume } = require("../controller/resume.controller");
 
 const resumeRouter = express.Router();
 const upload = multer({

@@ -1,0 +1,39 @@
+const express = require("express");
+const socialRouter = express.Router();
+const userMiddleware = require("../middleware/userMiddleware");
+
+const {
+  createPost,
+  updatePost,
+  deletePost,
+  follow,
+  unfollow,
+  likePost,
+  unlikePost,
+  commentPost,
+  editComment,
+  deleteComment,
+  getFeed,
+} = require("../controller/social.controller");
+
+socialRouter.post("/create", userMiddleware, createPost);
+socialRouter.put("/update/:postId", userMiddleware, updatePost);
+socialRouter.delete("/delete/:postId", userMiddleware, deletePost);
+socialRouter.post("/follow/:userId", userMiddleware, follow);
+socialRouter.post("/unfollow/:userId", userMiddleware, unfollow);
+socialRouter.post("/like/:postId", userMiddleware, likePost);
+socialRouter.post("/unlike/:postId", userMiddleware, unlikePost);
+socialRouter.post("/comment/:postId", userMiddleware, commentPost);
+socialRouter.put(
+  "/comment/update/:postId/:commentId",
+  userMiddleware,
+  editComment
+);
+socialRouter.delete(
+  "/comment/delete/:postId/:commentId",
+  userMiddleware,
+  deleteComment
+);
+socialRouter.get("/feed", userMiddleware, getFeed);
+
+module.exports = socialRouter;

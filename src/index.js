@@ -19,6 +19,7 @@ const { Server } = require("socket.io");
 const http = require("http");
 const resumeRouter = require("./routes/resumeRoutes");
 const aiVideoRouter = require("./routes/videoInterviewRouter");
+const socialRouter = require("./routes/social");
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -71,6 +72,7 @@ app.use("/challenge", challengeRouter);
 app.use("/ai-interview", aiInterviewRouter);
 app.use("/api/video-interview", aiVideoRouter);
 app.use("/resume", resumeRouter);
+app.use("/social", socialRouter);
 
 app.get("/test", (req, res) => {
   res.json({ message: "Backend connected!" });
