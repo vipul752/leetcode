@@ -74,8 +74,8 @@ const userSchema = new mongoose.Schema(
     lastSolvedAt: {
       type: Date,
     },
-    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }],
   },
   {

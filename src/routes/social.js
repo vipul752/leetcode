@@ -14,6 +14,8 @@ const {
   editComment,
   deleteComment,
   getFeed,
+  searchUser,
+  getUserProfile,
 } = require("../controller/social.controller");
 
 socialRouter.post("/create", userMiddleware, createPost);
@@ -35,5 +37,7 @@ socialRouter.delete(
   deleteComment
 );
 socialRouter.get("/feed", userMiddleware, getFeed);
+socialRouter.get("/search/:query", userMiddleware, searchUser);
+socialRouter.get("/profile/:firstName", userMiddleware, getUserProfile);
 
 module.exports = socialRouter;

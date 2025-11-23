@@ -269,12 +269,13 @@ const deleteComment = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
 const getFeed = async (req, res) => {
   try {
     const me = await User.findById(req.result._id).select("following");
 
     const feed = await Post.find({
-      owner: { $in: me.following }
+      owner: { $in: me.following },
     })
       .sort({ createdAt: -1 })
       .populate("owner", "firstName lastName avatar")
@@ -287,6 +288,55 @@ const getFeed = async (req, res) => {
   }
 };
 
+const searchUser = async (req, res) => {
+  try {
+    const { query } = req.params;
+
+    const users = await User.find({
+      $or: [
+        { firstName: { $regex: query, $options: "i" } },
+        { lastName: { $regex: query, $options: "i" } },
+        { username: { $regex: query, $options: "i" } },
+      ],
+    }).select("firstName lastName username avatar");
+
+    res.json(users);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const getUserProfile = async (req, res) => {
+  try {
+    const firstName = req.params.firstName.toLowerCase();
+
+    const user = await User.findOne({
+      firstName: { $regex: `^${firstName}$`, $options: "i" },
+    })
+      .select("-password")
+      .populate("followers", "firstName avatar")
+      .populate("following", "firstName avatar");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const postsCount = await Post.countDocuments({ owner: user._id });
+
+    res.json({
+      user,
+      stats: {
+        posts: postsCount,
+        followers: user.followers.length,
+        following: user.following.length,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
 
 module.exports = {
   createPost,
@@ -300,4 +350,6 @@ module.exports = {
   editComment,
   deleteComment,
   getFeed,
+  searchUser,
+  getUserProfile,
 };
