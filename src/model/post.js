@@ -7,7 +7,20 @@ const PostSchema = new mongoose.Schema(
       ref: "user",
       required: true,
     },
-    text: { type: String, required: true },
+    
+    title: { type: String,},
+
+    description: { type: String},
+
+    anonymous: {
+      type: Boolean,
+      default: false,
+    },
+
+    views: {
+      type: Number,
+      default: 0,
+    },
 
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }],
 

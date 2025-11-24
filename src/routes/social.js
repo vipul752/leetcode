@@ -16,6 +16,8 @@ const {
   getFeed,
   searchUser,
   getUserProfile,
+  incrementView,
+  numberOfLikes,
 } = require("../controller/social.controller");
 
 socialRouter.post("/create", userMiddleware, createPost);
@@ -39,5 +41,7 @@ socialRouter.delete(
 socialRouter.get("/feed", userMiddleware, getFeed);
 socialRouter.get("/search/:query", userMiddleware, searchUser);
 socialRouter.get("/profile/:firstName", userMiddleware, getUserProfile);
+socialRouter.post("/incrementView/:postId", userMiddleware, incrementView);
+socialRouter.get("/numberOfLikes/:postId", userMiddleware, numberOfLikes);
 
 module.exports = socialRouter;

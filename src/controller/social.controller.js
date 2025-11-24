@@ -4,15 +4,17 @@ const User = require("../model/user");
 const createPost = async (req, res) => {
   try {
     const user = req.result._id;
-    const text = req.body.text;
+    const { title, description, anonymous } = req.body;
 
-    if (!text || text.trim() === "") {
-      return res.status(400).json({ message: "Post text cannot be empty" });
+    if (!title || title.trim() === "") {
+      return res.status(400).json({ message: "Post title cannot be empty" });
     }
 
     const post = await Post.create({
       owner: user,
-      text,
+      title,
+      description,
+      anonymous,
     });
 
     await User.findByIdAndUpdate(user, {
@@ -28,7 +30,7 @@ const createPost = async (req, res) => {
 const updatePost = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const { text } = req.body;
+    const { title, description, anonymous } = req.body;
     const userId = req.result._id;
 
     const post = await Post.findById(postId);
@@ -36,7 +38,10 @@ const updatePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    post.text = text || post.text;
+    post.title = title || post.title;
+    post.description = description || post.description;
+    post.anonymous =
+      req.body.anonymous !== undefined ? req.body.anonymous : post.anonymous;
     await post.save();
 
     res.json(post);
@@ -272,16 +277,9 @@ const deleteComment = async (req, res) => {
 
 const getFeed = async (req, res) => {
   try {
-    const me = await User.findById(req.result._id).select("following");
+    const allPosts = await Post.find().populate("owner");
 
-    const feed = await Post.find({
-      owner: { $in: me.following },
-    })
-      .sort({ createdAt: -1 })
-      .populate("owner", "firstName lastName avatar")
-      .populate("comments.user", "firstName lastName avatar");
-
-    res.json(feed);
+    res.json(allPosts);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
@@ -338,6 +336,34 @@ const getUserProfile = async (req, res) => {
   }
 };
 
+const incrementView = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    post.views += 1;
+    await post.save();
+
+    res.json({ views: post.views });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const numberOfLikes = async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    res.json({ likes: post.likes.length });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
 module.exports = {
   createPost,
   updatePost,
@@ -352,4 +378,6 @@ module.exports = {
   getFeed,
   searchUser,
   getUserProfile,
+  incrementView,
+  numberOfLikes,
 };
