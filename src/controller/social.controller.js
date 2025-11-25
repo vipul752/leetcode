@@ -291,16 +291,32 @@ const getFeed = async (req, res) => {
 const searchUser = async (req, res) => {
   try {
     const { query } = req.params;
+    const loggedInUserId = req.result._id;
 
     const users = await User.find({
+      _id: { $ne: loggedInUserId },
       $or: [
         { firstName: { $regex: query, $options: "i" } },
         { lastName: { $regex: query, $options: "i" } },
         { username: { $regex: query, $options: "i" } },
       ],
-    }).select("firstName lastName username avatar");
+    }).select("firstName lastName username avatar followers following posts");
 
-    res.json(users);
+    const finalUsers = users.map((u) => ({
+      _id: u._id,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      username: u.username,
+      avatar: u.avatar,
+
+      followers: u.followers,
+      following: u.following,
+      posts: u.posts,
+
+      isFollowing: u.followers.includes(loggedInUserId),
+    }));
+
+    res.json(finalUsers);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
@@ -384,6 +400,81 @@ const getSinglePost = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+const follower = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId).populate(
+      "followers",
+      "firstName lastName username avatar"
+    );
+
+    res.json(user.followers);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const following = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId).populate(
+      "following",
+      "firstName lastName username avatar"
+    );
+
+    res.json(user.following);
+  } catch (err) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const removeFollower = async (req, res) => {
+  try {
+    const userId = req.result._id;
+    const followerId = req.params.id;
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { followers: followerId },
+    });
+
+    await User.findByIdAndUpdate(followerId, {
+      $pull: { following: userId },
+    });
+
+    res.json({ message: "Follower removed" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const getFollowers = async (req, res) => {
+  const userId = req.result._id;
+
+  const me = await User.findById(userId).populate(
+    "followers",
+    "firstName lastName username avatar followers following"
+  );
+
+  const result = me.followers.map((user) => ({
+    _id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    username: user.username,
+    avatar: user.avatar,
+
+    isFollowing: user.followers.includes(userId),
+    iFollowHim: user.following.includes(userId),
+
+    followBack: !user.following.includes(userId),
+  }));
+
+  res.json(result);
+};
+
 module.exports = {
   createPost,
   updatePost,
@@ -401,4 +492,8 @@ module.exports = {
   incrementView,
   numberOfLikes,
   getSinglePost,
+  follower,
+  following,
+  removeFollower,
+  getFollowers,
 };

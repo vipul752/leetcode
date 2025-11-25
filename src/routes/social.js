@@ -19,6 +19,10 @@ const {
   incrementView,
   numberOfLikes,
   getSinglePost,
+  follower,
+  following,
+  removeFollower,
+  getFollowers,
 } = require("../controller/social.controller");
 
 socialRouter.post("/create", userMiddleware, createPost);
@@ -45,5 +49,9 @@ socialRouter.get("/profile/:firstName", userMiddleware, getUserProfile);
 socialRouter.post("/incrementView/:postId", userMiddleware, incrementView);
 socialRouter.get("/numberOfLikes/:postId", userMiddleware, numberOfLikes);
 socialRouter.get("/post/:postId", userMiddleware, getSinglePost);
+socialRouter.get("/followers/:userId", userMiddleware, follower);
+socialRouter.get("/following/:userId", userMiddleware, following);
+socialRouter.delete("/delete/:userId", userMiddleware, removeFollower);
+socialRouter.get("/getFollowers", userMiddleware, getFollowers);
 
 module.exports = socialRouter;
