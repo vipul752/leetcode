@@ -202,7 +202,13 @@ const commentPost = async (req, res) => {
     post.comments.push({ user: userId, text: finalComment });
     await post.save();
 
-    res.json({ message: "Comment added", comments: post.comments });
+    const updatedPost = await Post.findById(postId).populate(
+      "comments.user",
+      "firstName lastName avatar _id"
+    );
+    const newComment = updatedPost.comments[updatedPost.comments.length - 1];
+
+    res.json(newComment);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
@@ -234,12 +240,8 @@ const editComment = async (req, res) => {
       commentObj.text = finalComment;
     }
 
-    await post.save();
-
-    res.json({
-      message: "Comment updated",
-      comments: post.comments,
-    });
+    await post.populate("comments.user", "firstName lastName avatar");
+    res.json(commentObj);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
@@ -265,10 +267,8 @@ const deleteComment = async (req, res) => {
     const comment = post.comments.id(commentId);
 
     commentObj.deleteOne();
-
     await post.save();
-
-    res.json({ message: "Comment deleted" });
+    res.json({ message: "Comment deleted", commentId });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error" });
@@ -277,7 +277,9 @@ const deleteComment = async (req, res) => {
 
 const getFeed = async (req, res) => {
   try {
-    const allPosts = await Post.find().populate("owner");
+    const allPosts = await Post.find()
+      .populate("owner", "firstName lastName avatar")
+      .populate("comments.user", "firstName lastName avatar");
 
     res.json(allPosts);
   } catch (error) {
@@ -364,6 +366,24 @@ const numberOfLikes = async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 };
+
+const getSinglePost = async (req, res) => {
+  try {
+    const postId = req.params.postId;
+
+    const post = await Post.findById(postId)
+      .populate("owner", "firstName lastName avatar")
+      .populate("comments.user", "firstName lastName avatar");
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    res.json(post);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
 module.exports = {
   createPost,
   updatePost,
@@ -380,4 +400,5 @@ module.exports = {
   getUserProfile,
   incrementView,
   numberOfLikes,
+  getSinglePost,
 };

@@ -18,6 +18,7 @@ const {
   getUserProfile,
   incrementView,
   numberOfLikes,
+  getSinglePost,
 } = require("../controller/social.controller");
 
 socialRouter.post("/create", userMiddleware, createPost);
@@ -43,5 +44,6 @@ socialRouter.get("/search/:query", userMiddleware, searchUser);
 socialRouter.get("/profile/:firstName", userMiddleware, getUserProfile);
 socialRouter.post("/incrementView/:postId", userMiddleware, incrementView);
 socialRouter.get("/numberOfLikes/:postId", userMiddleware, numberOfLikes);
+socialRouter.get("/post/:postId", userMiddleware, getSinglePost);
 
 module.exports = socialRouter;
