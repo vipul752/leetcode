@@ -23,6 +23,8 @@ const {
   following,
   removeFollower,
   getFollowers,
+  getUserPublicProfile,
+  getUserPost,
 } = require("../controller/social.controller");
 
 socialRouter.post("/create", userMiddleware, createPost);
@@ -53,5 +55,10 @@ socialRouter.get("/followers/:userId", userMiddleware, follower);
 socialRouter.get("/following/:userId", userMiddleware, following);
 socialRouter.delete("/delete/:userId", userMiddleware, removeFollower);
 socialRouter.get("/getFollowers", userMiddleware, getFollowers);
-
+socialRouter.get(
+  "/publicProfile/:username",
+  userMiddleware,
+  getUserPublicProfile
+);
+socialRouter.get("/getUserPost/:userId", userMiddleware, getUserPost);
 module.exports = socialRouter;

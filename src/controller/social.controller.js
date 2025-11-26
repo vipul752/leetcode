@@ -1,5 +1,6 @@
 const Post = require("../model/post");
 const User = require("../model/user");
+const mongoose = require("mongoose");
 
 const createPost = async (req, res) => {
   try {
@@ -475,6 +476,51 @@ const getFollowers = async (req, res) => {
   res.json(result);
 };
 
+const getUserPublicProfile = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    let user = null;
+
+    if (mongoose.Types.ObjectId.isValid(username)) {
+      user = await User.findById(username)
+        .select("-password")
+        .populate("followers", "firstName lastName avatar")
+        .populate("following", "firstName lastName avatar");
+    }
+
+    if (!user) {
+      user = await User.findOne({ username })
+        .select("-password")
+        .populate("followers", "firstName lastName avatar")
+        .populate("following", "firstName lastName avatar");
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error("PROFILE ERROR:", err);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const getUserPost = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const posts = await Post.find({ owner: userId })
+      .populate("owner", "firstName lastName avatar")
+      .populate("comments.user", "firstName lastName avatar");
+
+    res.json(posts);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 module.exports = {
   createPost,
   updatePost,
@@ -484,6 +530,7 @@ module.exports = {
   likePost,
   unlikePost,
   commentPost,
+  getUserPost,
   editComment,
   deleteComment,
   getFeed,
@@ -496,4 +543,5 @@ module.exports = {
   following,
   removeFollower,
   getFollowers,
+  getUserPublicProfile,
 };
