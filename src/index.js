@@ -78,6 +78,10 @@ app.get("/test", (req, res) => {
   res.json({ message: "Backend connected!" });
 });
 
+app.get("/ping", (req, res) => {
+  res.status(200).send("pong");
+});
+
 const initialseDB = async () => {
   try {
     await Promise.all([connectDB(), redisClient.connect()]);
