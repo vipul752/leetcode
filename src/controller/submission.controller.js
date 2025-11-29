@@ -84,7 +84,7 @@ const submitCode = async (req, res) => {
     const accepted = status === "Accepted";
     res.status(200).json({
       accepted,
-      totalTestCases: submittedResult.testCasesTotal,
+      totalTestCases: problem.hiddenTestcase.length,
       passedTestCases: testCasesPassed,
       runTime,
       memory,
@@ -155,7 +155,7 @@ const runCode = async (req, res) => {
       testCases: testResults,
       runTime,
       memory,
-      totalTestCases: testResults.length,
+      totalTestCases: problem.visibleTestcase.length,
       passedTestCases: testCasesPassed,
     });
   } catch (error) {

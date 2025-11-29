@@ -77,11 +77,58 @@ ${resumeText}
   );
   const content = result.data.choices[0].message.content;
 
-  const cleaned = cleanJSON(content)
-    .trim()
-    .replace(/,(\s*[}\]])/g, "$1"); 
+  try {
+    const cleaned = cleanJSON(content);
 
-  return JSON.parse(cleaned);
+    if (!cleaned) {
+      throw new Error("Could not extract JSON from response");
+    }
+
+    const parsed = JSON.parse(cleaned);
+
+    // Validate required fields
+    if (
+      !parsed.recommendations ||
+      !Array.isArray(parsed.recommendations) ||
+      parsed.recommendations.length === 0
+    ) {
+      parsed.recommendations = [
+        "Add more action verbs to describe achievements",
+        "Include quantifiable metrics and results",
+        "Improve formatting with consistent bullet points",
+        "Add relevant technical skills section",
+        "Include measurable impact in previous roles",
+      ];
+    }
+
+    if (!parsed.summaryImprovement) {
+      parsed.summaryImprovement =
+        "Strengthen professional summary with specific accomplishments and key skills that match job requirements.";
+    }
+
+    if (!parsed.experienceScore) {
+      parsed.experienceScore = 70;
+    }
+
+    return parsed;
+  } catch (error) {
+    console.error("JSON Parse Error:", error.message);
+    console.error("Content received:", content.substring(0, 200));
+
+    // Return fallback response on parse error
+    return {
+      experienceScore: 65,
+      recommendations: [
+        "Add more action verbs to describe achievements",
+        "Include quantifiable metrics and results",
+        "Improve formatting with consistent bullet points",
+        "Add relevant technical skills section",
+        "Include measurable impact in previous roles",
+      ],
+      summaryImprovement:
+        "Strengthen professional summary with specific accomplishments and key skills that match job requirements.",
+    };
+  }
 };
 
 module.exports = { aiAnalyze };

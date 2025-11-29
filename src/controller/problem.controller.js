@@ -392,7 +392,6 @@ const submittedProblem = async (req, res) => {
       });
     }
 
-  
     const allUserSubmissions = await Submission.find({ user_id }).sort({
       createdAt: -1,
     });

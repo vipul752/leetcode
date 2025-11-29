@@ -12,7 +12,26 @@ const analyzeResume = async (req, res) => {
     const { jobDescription } = req.body;
 
     const atsData = computeATS(resumeText, jobDescription || "");
-    const aiData = await aiAnalyze(resumeText);
+
+    let aiData;
+    try {
+      aiData = await aiAnalyze(resumeText);
+    } catch (aiError) {
+      console.error("AI Analysis Error:", aiError.message);
+      // Fallback if AI fails
+      aiData = {
+        experienceScore: 65,
+        recommendations: [
+          "Add more action verbs to describe achievements",
+          "Include quantifiable metrics and results",
+          "Improve formatting with consistent bullet points",
+          "Add relevant technical skills section",
+          "Include measurable impact in previous roles",
+        ],
+        summaryImprovement:
+          "Strengthen professional summary with specific accomplishments and key skills that match job requirements.",
+      };
+    }
 
     return res.json({
       success: true,
@@ -24,7 +43,7 @@ const analyzeResume = async (req, res) => {
       summaryImprovement: aiData.summaryImprovement,
     });
   } catch (error) {
-    console.log(error);
+    console.error("Resume analysis error:", error);
     res.status(500).json({
       message: "Resume analysis failed",
       error: error.message,
