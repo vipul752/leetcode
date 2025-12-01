@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-require("dotenv").config;
+require("dotenv").config();
 const connectDB = require("./config/db");
 const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/userAuth");
@@ -44,6 +44,7 @@ app.use(
       "https://codearena1-r7ab8a9ah-vipuls-projects-75a276d5.vercel.app", // add this
       "https://codearena1-ezm7gs1p9-vipuls-projects-75a276d5.vercel.app", // and this (latest)
       "http://localhost:5173",
+      "http://localhost:5174",
     ],
     credentials: true,
   })
