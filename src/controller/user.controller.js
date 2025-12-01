@@ -180,7 +180,9 @@ const updateProfile = async (req, res) => {
     res.status(200).json({ message: "Profile updated", profile: updatedUser });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Failed to update profile" });
+    res
+      .status(500)
+      .json({ message: "Failed to update profile", error: error.message });
   }
 };
 
