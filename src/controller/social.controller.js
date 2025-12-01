@@ -521,6 +521,46 @@ const getUserPost = async (req, res) => {
   }
 };
 
+const checkFollow = async (req, res) => {
+  try {
+    const userId = req.result._id;
+    const targetUserId = req.params.userId;
+
+    const user = await User.findById(userId);
+
+    const isFollowing = user.following.includes(targetUserId);
+    res.json({ isFollowing });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const isBothUserFollowEachOther = async (req, res) => {
+  try {
+    const user1 = req.result._id; 
+    const user2 = req.params.userId; 
+
+   
+    const user1Follows = await User.exists({
+      _id: user1,
+      following: user2,
+    });
+
+    const user2Follows = await User.exists({
+      _id: user2,
+      following: user1,
+    });
+
+    const bothFollow = Boolean(user1Follows && user2Follows);
+
+    return res.status(200).json({ bothFollow });
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   createPost,
   updatePost,
@@ -544,4 +584,6 @@ module.exports = {
   removeFollower,
   getFollowers,
   getUserPublicProfile,
+  checkFollow,
+  isBothUserFollowEachOther,
 };

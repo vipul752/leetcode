@@ -25,6 +25,8 @@ const {
   getFollowers,
   getUserPublicProfile,
   getUserPost,
+  checkFollow,
+  isBothUserFollowEachOther,
 } = require("../controller/social.controller");
 
 socialRouter.post("/create", userMiddleware, createPost);
@@ -61,4 +63,11 @@ socialRouter.get(
   getUserPublicProfile
 );
 socialRouter.get("/getUserPost/:userId", userMiddleware, getUserPost);
+socialRouter.get("/checkFollow/:userId", userMiddleware, checkFollow);
+socialRouter.get(
+  "/isBothUserFollowEachOther/:userId",
+  userMiddleware,
+  isBothUserFollowEachOther
+);
+
 module.exports = socialRouter;

@@ -6,13 +6,14 @@ const crypto = require("crypto");
 require("dotenv").config();
 const Submission = require("../model/submission");
 const sendEmail = require("../utils/sendEmail");
+const Problem = require("../model/problem");
 
 const generateToken = (user) =>
   jwt.sign(
     { id: user._id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
     {
-      expiresIn: "1h",
+      expiresIn: "24h",
     }
   );
 
@@ -30,7 +31,7 @@ const register = async (req, res) => {
       { id: user._id, email: user.email, role: "user" },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "24h",
       }
     );
 
@@ -43,7 +44,7 @@ const register = async (req, res) => {
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      maxAge: 3600000,
+      maxAge: 86400000,
     });
 
     res.status(201).json({
@@ -76,7 +77,7 @@ const login = async (req, res) => {
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      maxAge: 10800000,
+      maxAge: 86400000,
     });
 
     const reply = {
@@ -122,10 +123,10 @@ const adminRegister = async (req, res) => {
       { id: user._id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "24h",
       }
     );
-    res.cookie("token", token, { httpOnly: true, maxAge: 3600000 });
+    res.cookie("token", token, { httpOnly: true, maxAge: 86400000 });
 
     res.status(201).json({ message: "User registered successfully", token });
   } catch (error) {
@@ -293,6 +294,70 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const dashBoard = async (req, res) => {
+  try {
+    const userId = req.result._id;
+
+    const user = await User.findById(userId)
+      .select(
+        "firstName lastName totalSolved problemSolved followers avatar posts submissions"
+      )
+      .populate("problemSolved")
+      .populate("posts");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const totalProblemsSolved =
+      user.totalSolved || user.problemSolved?.length || 0;
+    const recentProblems = (user.problemSolved || [])
+      .slice(0, 10)
+      .map((problemId) => ({
+        problemId,
+      }));
+
+    const submissions = await Submission.find({ user_id: userId });
+
+    const solvedSet = new Set();
+    let totalSubmissions = submissions.length;
+    let accepted = 0;
+
+    submissions.forEach((s) => {
+      if (s.status === "Accepted") {
+        solvedSet.add(s.problem_id.toString());
+        accepted++;
+      }
+    });
+
+    const problems = await Problem.find({ _id: { $in: [...solvedSet] } });
+    const byDifficulty = { Easy: 0, Medium: 0, Hard: 0 };
+    problems.forEach((p) => byDifficulty[p.difficulty]++);
+
+    res.status(200).json({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatar: user.avatar,
+      totalProblemsSolved,
+      recentProblems,
+      followersCount: user.followers?.length || 0,
+      oneVsOneStats: user.oneVsOneStats,
+      posts: user.posts,
+      totalSubmissions,
+      acceptanceRate: totalSubmissions
+        ? (accepted / totalSubmissions) * 100
+        : 0,
+      byDifficulty,
+    });
+  } catch (error) {
+    console.error("Dashboard error:", error);
+    res.status(500).json({
+      message: "Failed to fetch dashboard data",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -304,4 +369,5 @@ module.exports = {
   getNoOfUsers,
   forgetPassword,
   resetPassword,
+  dashBoard,
 };

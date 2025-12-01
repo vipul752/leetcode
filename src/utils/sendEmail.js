@@ -10,7 +10,6 @@ const sendEmail = async ({ to, subject, html }) => {
       subject,
       html,
     });
-    console.log("✅ Email sent successfully:", response.id);
     return response;
   } catch (error) {
     console.error("❌ Email failed:", error);

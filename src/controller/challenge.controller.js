@@ -64,7 +64,6 @@ const joinChallengeRoom = async (req, res) => {
     const io = req.app.get("io");
     if (io) {
       const challengeNamespace = io.of("/challenge");
-      
 
       // Notify that opponent joined
       challengeNamespace.to(room.roomId).emit("opponentJoined", {

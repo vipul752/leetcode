@@ -11,6 +11,7 @@ const {
   updateProfile,
   forgetPassword,
   resetPassword,
+  dashBoard,
 } = require("../controller/user.controller");
 const userMiddleware = require("../middleware/userMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
@@ -35,5 +36,6 @@ authRouter.put("/updateProfile", userMiddleware, updateProfile);
 authRouter.get("/getNoOfUsers", getNoOfUsers);
 authRouter.post("/forgetPassword", forgetPassword);
 authRouter.post("/reset-password/:token", resetPassword);
+authRouter.get("/dashboard", userMiddleware, dashBoard);
 
 module.exports = authRouter;
