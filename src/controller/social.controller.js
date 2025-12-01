@@ -326,10 +326,10 @@ const searchUser = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
   try {
-    const firstName = req.params.firstName.toLowerCase();
+    const userId = req.params.userId;
 
     const user = await User.findOne({
-      firstName: { $regex: `^${firstName}$`, $options: "i" },
+      _id: userId,
     })
       .select("-password")
       .populate("followers", "firstName avatar")
@@ -538,10 +538,9 @@ const checkFollow = async (req, res) => {
 
 const isBothUserFollowEachOther = async (req, res) => {
   try {
-    const user1 = req.result._id; 
-    const user2 = req.params.userId; 
+    const user1 = req.result._id;
+    const user2 = req.params.userId;
 
-   
     const user1Follows = await User.exists({
       _id: user1,
       following: user2,

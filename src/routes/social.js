@@ -49,7 +49,7 @@ socialRouter.delete(
 );
 socialRouter.get("/feed", userMiddleware, getFeed);
 socialRouter.get("/search/:query", userMiddleware, searchUser);
-socialRouter.get("/profile/:firstName", userMiddleware, getUserProfile);
+socialRouter.get("/profile/:userId", userMiddleware, getUserProfile);
 socialRouter.post("/incrementView/:postId", userMiddleware, incrementView);
 socialRouter.get("/numberOfLikes/:postId", userMiddleware, numberOfLikes);
 socialRouter.get("/post/:postId", userMiddleware, getSinglePost);
