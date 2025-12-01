@@ -9,6 +9,8 @@ const {
   getProfile,
   getNoOfUsers,
   updateProfile,
+  forgetPassword,
+  resetPassword,
 } = require("../controller/user.controller");
 const userMiddleware = require("../middleware/userMiddleware");
 const adminMiddleware = require("../middleware/adminMiddleware");
@@ -31,5 +33,7 @@ authRouter.get("/check", userMiddleware, (req, res) => {
 authRouter.get("/getProfile", userMiddleware, getProfile);
 authRouter.put("/updateProfile", userMiddleware, updateProfile);
 authRouter.get("/getNoOfUsers", getNoOfUsers);
+authRouter.post("/forgetPassword", forgetPassword);
+authRouter.post("/reset-password/:token", resetPassword);
 
 module.exports = authRouter;

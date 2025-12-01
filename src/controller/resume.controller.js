@@ -18,7 +18,6 @@ const analyzeResume = async (req, res) => {
       aiData = await aiAnalyze(resumeText);
     } catch (aiError) {
       console.error("AI Analysis Error:", aiError.message);
-      // Fallback if AI fails
       aiData = {
         experienceScore: 65,
         recommendations: [
