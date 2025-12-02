@@ -23,7 +23,7 @@ const challengeRoomSchema = new mongoose.Schema({
     default: "waiting",
   },
   startAt: { type: Date },
-  durationSec: { type: Number, default: 1800 }, // 30 min
+  durationSec: { type: Number, default: 1800 },
   winner: { type: mongoose.Schema.Types.ObjectId, ref: "user", default: null },
 });
 

@@ -233,12 +233,10 @@ const forgetPassword = async (req, res) => {
       console.log("✅ Email sent successfully to:", user.email);
     } catch (emailError) {
       console.error("❌ Email sending failed:", emailError);
-      // Continue anyway, user can still use the token
     }
 
     res.status(200).json({
-      message: "Password reset link sent to email",
-      resetToken: resetToken, // For testing - remove in production
+      message: "Password reset link sent to email", 
     });
   } catch (error) {
     console.error("❌ Forget password error:", error);
@@ -253,7 +251,6 @@ const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { newPassword, confirmPassword } = req.body;
 
-    // Validate input
     if (!newPassword || !confirmPassword) {
       return res
         .status(400)

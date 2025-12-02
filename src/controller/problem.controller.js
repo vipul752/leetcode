@@ -267,7 +267,6 @@ const deleteProblem = async (req, res) => {
       });
     }
 
-    // Delete the problem
     const deletedProblem = await Problem.findByIdAndDelete(id);
     if (!deletedProblem) {
       return res.status(404).json({
@@ -276,13 +275,11 @@ const deleteProblem = async (req, res) => {
       });
     }
 
-    // Remove this problem id from all users' problemSolved
     await User.updateMany(
-      { problemSolved: id }, // only users who solved it
-      { $pull: { problemSolved: id } } // remove from array
+      { problemSolved: id },
+      { $pull: { problemSolved: id } }
     );
 
-    // If you also want to remove from submissions or other arrays:
     await User.updateMany(
       { problemSubmitted: id },
       { $pull: { problemSubmitted: id } }
@@ -328,7 +325,6 @@ const getProblemById = async (req, res) => {
       const responseData = {
         ...foundProblem.toObject(),
 
-        // cloudinaryPublicId: video.cloudinaryPublicId,
         secureUrl: video.secureUrl,
         duration: video.duration,
         thumbnailUrl: video.thumbnailUrl,
@@ -377,10 +373,9 @@ const solvedProblemByUser = async (req, res) => {
 
 const submittedProblem = async (req, res) => {
   try {
-    const user_id = req.result._id; // from middleware auth
+    const user_id = req.result._id;
     const problem_id = req.params.pid;
 
-    // Find all submissions by this user for this problem
     const submissions = await Submission.find({ user_id, problem_id }).sort({
       createdAt: -1,
     });
@@ -396,14 +391,13 @@ const submittedProblem = async (req, res) => {
       createdAt: -1,
     });
 
-    // Extract unique days when user submitted something
     const submissionDays = [
       ...new Set(
         allUserSubmissions.map(
           (s) => new Date(s.createdAt).toISOString().split("T")[0]
         )
       ),
-    ].sort((a, b) => new Date(b) - new Date(a)); // Sort descending
+    ].sort((a, b) => new Date(b) - new Date(a));
 
     let streak = 0;
     let today = new Date().toISOString().split("T")[0];
@@ -412,19 +406,18 @@ const submittedProblem = async (req, res) => {
     for (let day of submissionDays) {
       if (day === expectedDate) {
         streak++;
-        // move expectedDate one day back
         let d = new Date(expectedDate);
         d.setDate(d.getDate() - 1);
         expectedDate = d.toISOString().split("T")[0];
       } else {
-        break; // streak breaks
+        break; 
       }
     }
 
     res.status(200).json({
       success: true,
       submissions,
-      streak, // added streak info
+      streak, 
     });
   } catch (error) {
     console.error(error);

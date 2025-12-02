@@ -60,18 +60,14 @@ const joinChallengeRoom = async (req, res) => {
     room.startAt = new Date();
     await room.save();
 
-    // Emit socket event to notify creator that opponent joined
     const io = req.app.get("io");
     if (io) {
       const challengeNamespace = io.of("/challenge");
 
-      // Notify that opponent joined
       challengeNamespace.to(room.roomId).emit("opponentJoined", {
         opponentId: userId,
         durationSec: room.durationSec,
       });
-
-      // Start the challenge for both users
       challengeNamespace.to(room.roomId).emit("challengeStarted", {
         problem: room.problem,
         startAt: room.startAt,

@@ -35,9 +35,8 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    // ✅ Profile fields
     avatar: {
-      type: String, // Cloudinary URL for profile pic
+      type: String, 
       default: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
     },
     bio: {
@@ -48,7 +47,6 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
 
-    // ✅ Problem tracking
     problemSolved: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -84,7 +82,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-//pre save mongoose
 
 const User = mongoose.model("user", userSchema);
 module.exports = User;

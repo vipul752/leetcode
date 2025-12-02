@@ -38,7 +38,6 @@ const createContest = async (req, res) => {
 
       const { visibleTestcase, referenceSolution } = problem;
 
-      // Skip empty or invalid reference solutions
       if (!referenceSolution || referenceSolution.length === 0) {
         return res.status(400).json({
           message: `Problem ${problem.title} missing referenceSolution`,
@@ -64,7 +63,6 @@ const createContest = async (req, res) => {
 
           switch (status.id) {
             case 3:
-              // Accepted ✅
               break;
             case 4:
               return res.status(400).json({
@@ -142,7 +140,6 @@ const getAllContests = async (req, res) => {
       }
     }
 
-    // Send updated contests
     res.status(200).json({ contests });
   } catch (error) {
     console.error(error);
@@ -285,7 +282,6 @@ const submitContestCode = async (req, res) => {
       }
     }
 
-    // Create contest submission entry
     await ContestSubmission.create({
       userId: user_id,
       contestId,

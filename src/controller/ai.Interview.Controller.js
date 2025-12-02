@@ -11,7 +11,6 @@ const startAIInterview = async (req, res) => {
     const userId = req.result._id;
     const { mode = "mixed" } = req.body;
 
-    // Validate mode
     const validModes = ["webdev", "dsa", "systemdesign", "mixed"];
     if (!validModes.includes(mode)) {
       return res

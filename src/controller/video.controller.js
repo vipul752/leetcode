@@ -99,7 +99,6 @@ const saveVideoMetaData = async (req, res) => {
 
 const deleteVideo = async (req, res) => {
   try {
-    //i dont send videoID in param in tackel this
     const { videoId } = req.body;
 
     const video = await SolutionVideo.findById(videoId);

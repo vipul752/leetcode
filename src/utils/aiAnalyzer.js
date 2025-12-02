@@ -86,7 +86,6 @@ ${resumeText}
 
     const parsed = JSON.parse(cleaned);
 
-    // Validate required fields
     if (
       !parsed.recommendations ||
       !Array.isArray(parsed.recommendations) ||
@@ -115,7 +114,6 @@ ${resumeText}
     console.error("JSON Parse Error:", error.message);
     console.error("Content received:", content.substring(0, 200));
 
-    // Return fallback response on parse error
     return {
       experienceScore: 65,
       recommendations: [

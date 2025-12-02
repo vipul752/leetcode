@@ -15,7 +15,6 @@ const contestSubmissionSchema = new mongoose.Schema({
   code: { type: String, required: true },
   language: { type: String, required: true },
 
-  // Submission result fields
   status: {
     type: String,
     enum: ["Pending", "Accepted", "Wrong Answer", "Error"],
@@ -23,8 +22,8 @@ const contestSubmissionSchema = new mongoose.Schema({
   },
   passedTestCases: { type: Number, default: 0 },
   totalTestCases: { type: Number, default: 0 },
-  runtime: { type: Number, default: 0 }, // in seconds
-  memory: { type: Number, default: 0 }, // in KB
+  runtime: { type: Number, default: 0 }, 
+  memory: { type: Number, default: 0 }, 
   errorMessage: { type: String, default: "" },
 
   timeTaken: { type: Number, default: 0 },

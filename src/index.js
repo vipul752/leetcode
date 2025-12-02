@@ -24,7 +24,7 @@ const socialRouter = require("./routes/social");
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", // or your frontend URL
+    origin: "*", 
     methods: ["GET", "POST"],
   },
 });
@@ -41,8 +41,8 @@ app.use(
     origin: [
       "https://codearena.digital",
       "https://www.codearena.digital",
-      "https://codearena1-r7ab8a9ah-vipuls-projects-75a276d5.vercel.app", // add this
-      "https://codearena1-ezm7gs1p9-vipuls-projects-75a276d5.vercel.app", // and this (latest)
+      "https://codearena1-r7ab8a9ah-vipuls-projects-75a276d5.vercel.app", 
+      "https://codearena1-ezm7gs1p9-vipuls-projects-75a276d5.vercel.app",
       "http://localhost:5173",
       "http://localhost:5174",
     ],
@@ -56,8 +56,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true, // true because Render uses HTTPS
-      sameSite: "none", // needed for cross-site requestsr
+      secure: true,
+      sameSite: "none",
       httpOnly: true,
     },
   })

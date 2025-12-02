@@ -3,7 +3,6 @@ function cleanJSON(str) {
 
   let cleaned = str.replace(/^```json\n?/i, "").replace(/\n?```$/, "");
 
-  // Find JSON start and end positions
   const jsonStart = cleaned.indexOf("{");
   const jsonEnd = cleaned.lastIndexOf("}");
 
@@ -11,16 +10,14 @@ function cleanJSON(str) {
     return "";
   }
 
-  // Extract only the JSON portion
   cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
 
-  // Fix common issues
   cleaned = cleaned
-    .replace(/,\s*([}\]])/g, "$1") // Remove trailing commas
-    .replace(/([{,:\[])\s*"?([a-zA-Z_][a-zA-Z0-9_]*)"?\s*:/g, '$1"$2":') // Quote unquoted keys
-    .replace(/:\s*'([^']*)'/g, ': "$1"') // Replace single quotes with double quotes for values
-    .replace(/\n/g, " ") // Remove line breaks
-    .replace(/\s+/g, " ") // Normalize whitespace
+    .replace(/,\s*([}\]])/g, "$1") 
+    .replace(/([{,:\[])\s*"?([a-zA-Z_][a-zA-Z0-9_]*)"?\s*:/g, '$1"$2":') 
+    .replace(/:\s*'([^']*)'/g, ': "$1"') 
+    .replace(/\n/g, " ") 
+    .replace(/\s+/g, " ") 
     .trim();
 
   return cleaned;

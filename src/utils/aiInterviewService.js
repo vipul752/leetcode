@@ -4,7 +4,6 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-001" });
 const activeSessions = new Map();
 
-// Detect interview strength from answer
 const detectStrength = (text) => {
   const normalized = text.toLowerCase();
 
@@ -47,8 +46,8 @@ const startInterview = async (userId, mode = "mixed") => {
   const session = {
     id: sessionId,
     userId,
-    mode, // "webdev" | "dsa" | "systemdesign" | "mixed"
-    phase: "opening", // "opening" | "technical" | "followup" | "wrapup"
+    mode, 
+    phase: "opening",
     history: [
       {
         role: "model",
@@ -105,14 +104,12 @@ const generateNextQuestion = async (session, userMessage = "") => {
     };
   }
 
-  // Add user response to history
   if (userMessage) {
     session.history.push({
       role: "user",
       parts: [{ text: userMessage }],
     });
 
-    // Detect strength from answer
     session.technicalStrength = detectStrength(userMessage);
     session.questionCount++;
   }
@@ -120,7 +117,6 @@ const generateNextQuestion = async (session, userMessage = "") => {
   updatePhase(session);
   const secondsRemaining = getTimeRemaining(session);
 
-  // Master Interviewer Prompt
   const systemPrompt = `You are a senior software engineer and expert interviewer from Google.
 
 Your voice should follow these rules:
@@ -220,7 +216,6 @@ Avoid long sentences or complex structures.
     parts: [{ text: aiText }],
   });
 
-  // Check if we should start wrapup
   const minutesRemaining = Math.round(secondsRemaining / 60);
   if (minutesRemaining <= 2 && session.phase === "wrapup") {
     return {

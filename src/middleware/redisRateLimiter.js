@@ -5,7 +5,6 @@ const submitRateLimiter = async (req, res, next) => {
   const redisKey = `submit_cooldown${user_id}`;
 
   try {
-    //if user have recent submission
     const exist = await redisClient.exists(redisKey);
     if (exist) {
       return res.status(429).json({
@@ -13,7 +12,6 @@ const submitRateLimiter = async (req, res, next) => {
       });
     }
 
-    //set cooldown peroid
     await redisClient.set(redisKey, "cooldown_active", {
       EX: 10,
       NX: true,

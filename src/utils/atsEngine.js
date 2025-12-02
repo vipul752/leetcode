@@ -1,5 +1,4 @@
 const SKILL_WEIGHTS = {
-  // Senior/High-value skills
   "machine learning": 9,
   "deep learning": 9,
   llm: 9,
@@ -8,7 +7,6 @@ const SKILL_WEIGHTS = {
   kubernetes: 8,
   docker: 8,
 
-  // Core programming languages
   python: 7,
   java: 7,
   "c++": 7,
@@ -17,7 +15,6 @@ const SKILL_WEIGHTS = {
   go: 6,
   rust: 6,
 
-  // Frameworks/Tools
   react: 6,
   "node.js": 6,
   express: 6,
@@ -64,7 +61,6 @@ const computeKeywordScore = (resumeText, jobDescription) => {
   const normalizedResume = resumeText.toLowerCase();
   const normalizedJD = jobDescription.toLowerCase();
 
-  // Extract all potential keywords (2+ chars)
   const jdWords = normalizedJD.match(/\b[a-z+#]{2,}\b/gi) || [];
   const uniqueJDWords = [...new Set(jdWords)];
 
@@ -119,7 +115,6 @@ const extractYearsOfExperience = (text) => {
     ) {
       endYear = currentYear;
     } else if (endRaw.length === 2) {
-      // Convert 2-digit year to full year
       const twoDigit = parseInt(endRaw);
       endYear = twoDigit < 30 ? 2000 + twoDigit : 1900 + twoDigit;
     } else {
@@ -154,7 +149,6 @@ const extractEducation = (text) => {
     normalizedText.includes(keyword)
   );
 
-  // Check for reputable institutions
   const topUniversities = [
     "mit",
     "stanford",
@@ -182,7 +176,6 @@ const extractEducation = (text) => {
 };
 
 const extractAchievements = (text) => {
-  // Look for quantifiable achievements
   const numberPatterns = [
     /(\d+)%\s*(?:increase|growth|improvement|reduction)/gi,
     /saved\s*\$?(\d+[km]?)/gi,
@@ -251,7 +244,7 @@ const computeLengthScore = (text) => {
   if (wordCount > 800 && wordCount <= 1000) return 80;
   if (wordCount >= 200 && wordCount < 300) return 60;
   if (wordCount > 1000 && wordCount <= 1200) return 60;
-  return Math.max(0, 30); // Too short or too long
+  return Math.max(0, 30);
 };
 
 const computeATS = (resumeText, jobDescription = "") => {
@@ -290,16 +283,14 @@ const computeATS = (resumeText, jobDescription = "") => {
   const detectFresher = (text) => {
     const normalized = text.toLowerCase();
 
-    // If education ends after 2022 → treat as fresher
     if (/2023|2024|2025|2026/.test(normalized)) return true;
 
-    // No valid experience period means fresher
     const hasDateRange = /(\d{4})\s*[-–—]\s*(\d{4}|present|current)/i.test(
       normalized
     );
     if (!hasDateRange) return true;
 
-    // keywords
+    
     const fresherKeywords = ["fresher", "internship", "entry level"];
     if (fresherKeywords.some((k) => normalized.includes(k))) return true;
 

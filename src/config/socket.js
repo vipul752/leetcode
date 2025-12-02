@@ -13,7 +13,6 @@ function initSocket(io) {
 
     socket.on("joinAsCreator", async ({ roomId, userId }) => {
 
-      // Find room with case-insensitive search
       const room = await ChallengeRoom.findOne({
         roomId: { $regex: `^${roomId}$`, $options: "i" },
       }).populate("problem");
@@ -23,7 +22,6 @@ function initSocket(io) {
         return socket.emit("error", { message: "Room not found" });
       }
 
-      // Use exact roomId from database
       socket.join(room.roomId);
 
 
@@ -49,7 +47,6 @@ function initSocket(io) {
 
     socket.on("joinRoom", async ({ roomId, userId }) => {
 
-      // Find room with case-insensitive search
       const room = await ChallengeRoom.findOne({
         roomId: { $regex: `^${roomId}$`, $options: "i" },
       }).populate("problem");
@@ -58,7 +55,6 @@ function initSocket(io) {
         return socket.emit("error", { message: "Room not found" });
       }
 
-      // Use exact roomId from database
       socket.join(room.roomId);
 
       if (!room.creator) {
@@ -72,13 +68,11 @@ function initSocket(io) {
         await room.save();
 
 
-        // First notify about opponent joining
         challengeNamespace.to(room.roomId).emit("opponentJoined", {
           opponentId: userId,
           durationSec: room.durationSec,
         });
 
-        // Then start the challenge for both users
         challengeNamespace.to(room.roomId).emit("challengeStarted", {
           problem: room.problem,
           startAt: room.startAt,
@@ -101,7 +95,6 @@ function initSocket(io) {
       console.log("❌ Socket disconnected:", socket.id);
     });
 
-    // Handle code submission
     socket.on("submitCode", async ({ roomId, userId, status }) => {
       try {
         if (status === "accepted") {
@@ -120,7 +113,6 @@ function initSocket(io) {
       }
     });
 
-    // Handle disconnect
     socket.on("disconnecting", async () => {
       try {
         const rooms = Array.from(socket.rooms).filter((r) => r !== socket.id);
