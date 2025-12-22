@@ -20,11 +20,12 @@ const http = require("http");
 const resumeRouter = require("./routes/resumeRoutes");
 const aiVideoRouter = require("./routes/videoInterviewRouter");
 const socialRouter = require("./routes/social");
+const resumeCreation = require("./routes/resume-create");
 
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*", 
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
@@ -41,7 +42,7 @@ app.use(
     origin: [
       "https://codearena.digital",
       "https://www.codearena.digital",
-      "https://codearena1-r7ab8a9ah-vipuls-projects-75a276d5.vercel.app", 
+      "https://codearena1-r7ab8a9ah-vipuls-projects-75a276d5.vercel.app",
       "https://codearena1-ezm7gs1p9-vipuls-projects-75a276d5.vercel.app",
       "http://localhost:5173",
       "http://localhost:5174",
@@ -74,6 +75,7 @@ app.use("/ai-interview", aiInterviewRouter);
 app.use("/api/video-interview", aiVideoRouter);
 app.use("/resume", resumeRouter);
 app.use("/social", socialRouter);
+app.use("/resume-creation", resumeCreation);
 
 app.get("/test", (req, res) => {
   res.json({ message: "Backend connected!" });
