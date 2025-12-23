@@ -1,6 +1,10 @@
 const express = require("express");
 const multer = require("multer");
-const { analyzeResume } = require("../controller/resume.controller");
+const {
+  analyzeResume,
+  generateResumePDF,
+} = require("../controller/resume.controller");
+const userMiddleware = require("../middleware/userMiddleware");
 
 const resumeRouter = express.Router();
 const upload = multer({
@@ -11,5 +15,6 @@ const upload = multer({
 });
 
 resumeRouter.post("/analyze", upload.single("resume"), analyzeResume);
+resumeRouter.post("/generate-pdf", userMiddleware, generateResumePDF);
 
 module.exports = resumeRouter;

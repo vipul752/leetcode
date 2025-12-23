@@ -8,11 +8,13 @@ const {
   deleteResume,
   userResume,
   getSingleResume,
+  ge
 } = require("../controller/resume-create.controller");
 resumeCreation.post("/create", userMiddleware, createResume);
 resumeCreation.put("/update/:id", userMiddleware, updateResume);
 resumeCreation.delete("/delete/:id", userMiddleware, deleteResume);
 resumeCreation.get("/user-resumes", userMiddleware, userResume);
 resumeCreation.get("/resume/:id", userMiddleware, getSingleResume);
+
 
 module.exports = resumeCreation;

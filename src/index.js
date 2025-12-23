@@ -20,7 +20,7 @@ const http = require("http");
 const resumeRouter = require("./routes/resumeRoutes");
 const aiVideoRouter = require("./routes/videoInterviewRouter");
 const socialRouter = require("./routes/social");
-const resumeCreation = require("./routes/resume-create");
+const resumeCreation = require("./routes/resume-create.js");
 
 const server = http.createServer(app);
 const io = new Server(server, {

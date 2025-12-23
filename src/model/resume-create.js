@@ -50,18 +50,18 @@ const resumeSchema = new mongoose.Schema(
       {
         company: {
           type: String,
-          required: true,
         },
         role: {
           type: String,
-          required: true,
         },
         startDate: {
           type: Date,
-          required: true,
+
+          default: Date.now,
         },
         endDate: {
           type: Date,
+          default: Date.now,
         },
         description: {
           type: String,
@@ -72,15 +72,12 @@ const resumeSchema = new mongoose.Schema(
       {
         institute: {
           type: String,
-          required: true,
         },
         degree: {
           type: String,
-          required: true,
         },
         startYear: {
           type: Number,
-          required: true,
         },
         endYear: {
           type: Number,
@@ -91,7 +88,6 @@ const resumeSchema = new mongoose.Schema(
       {
         title: {
           type: String,
-          required: true,
         },
         description: {
           type: String,
